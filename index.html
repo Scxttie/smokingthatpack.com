@@ -23,6 +23,17 @@
     </style>
 </head>
 <body>
-    <video src="packed.mp4" autoplay loop></video>
+    <video id="bgVideo" src="packed.mp4" loop></video>
+    <script>
+        window.addEventListener('load', function() {
+            const video = document.getElementById('bgVideo');
+            video.play().catch(() => {
+                // Autoplay with sound failed, prompt user interaction
+                document.body.addEventListener('click', () => {
+                    video.play();
+                }, { once: true });
+            });
+        });
+    </script>
 </body>
 </html>
