@@ -23,10 +23,17 @@
     </style>
 </head>
 <body>
-    <video id="bgVideo" src="packed.mp4" loop></video>
+    <video id="bgVideo" src="packed.mp4" muted loop autoplay playsinline></video>
     <script>
         window.addEventListener('load', function() {
             const video = document.getElementById('bgVideo');
+
+            // Event listener to unmute the video once it starts playing
+            video.addEventListener('playing', () => {
+                video.muted = false;
+                console.log("Video is now unmuted.");
+            });
+
             // Try to play the video after a brief delay to allow resources to load
             setTimeout(() => {
                 video.play().then(() => {
