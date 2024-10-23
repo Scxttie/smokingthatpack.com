@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PACKED</title>
+    <title>Full Screen Video</title>
     <style>
         html, body {
             margin: 0;
@@ -27,12 +27,35 @@
     <script>
         window.addEventListener('load', function() {
             const video = document.getElementById('bgVideo');
-            video.play().catch(() => {
-                // Autoplay with sound failed, prompt user interaction
-                document.body.addEventListener('click', () => {
-                    video.play();
-                }, { once: true });
-            });
+            
+            // Attempt to autoplay with sound and fullscreen
+            const attemptPlay = () => {
+                video.play().then(() => {
+                    console.log("Video autoplay started successfully.");
+                    
+                    // Request fullscreen if not already in fullscreen mode
+                    if (!document.fullscreenElement) {
+                        video.requestFullscreen().catch(error => {
+                            console.warn("Fullscreen request failed:", error);
+                        });
+                    }
+                }).catch(error => {
+                    console.warn("Autoplay failed. Browser restrictions require user interaction.");
+                    
+                    // Add an interaction listener for fallback
+                    document.body.addEventListener('click', () => {
+                        video.play();
+                        
+                        // Request fullscreen on user interaction
+                        video.requestFullscreen().catch(error => {
+                            console.warn("Fullscreen request failed:", error);
+                        });
+                    }, { once: true });
+                });
+            };
+
+            // Try to play the video after a brief delay to allow resources to load
+            setTimeout(attemptPlay, 1000);
         });
     </script>
 </body>
