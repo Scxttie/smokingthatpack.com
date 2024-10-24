@@ -31,6 +31,14 @@
             // Ensure the video is muted to meet autoplay policy requirements
             video.muted = true;
 
+            // Event listener to unmute the video once it's ready to play
+            video.addEventListener('canplay', () => {
+                if (video.muted) {
+                    video.muted = false;
+                    console.log("Video is now unmuted after successful autoplay.");
+                }
+            });
+
             // Attempt to play the video
             video.play().then(() => {
                 console.log("Video autoplay started successfully.");
