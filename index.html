@@ -24,7 +24,7 @@
 </head>
 <body>
     <video id="bgVideo" src="packed.mp4" loop autoplay playsinline></video>
-    <audio id="bgAudio" src="packed.mp3" loop></audio>
+    <audio id="bgAudio" src="packed.mp3" loop muted></audio>
     <script>
         window.addEventListener('load', () => {
             const video = document.getElementById('bgVideo');
@@ -33,24 +33,26 @@
             // Ensure the video is muted to meet autoplay policy requirements
             video.muted = true;
 
-            // Function to play the audio once the video is confirmed to be playing
-            const playAudioWhenVideoIsPlaying = () => {
-                // Unmute the audio and attempt to play it
-                audio.muted = false;
-                audio.play().then(() => {
-                    console.log("Audio started playing after video playback.");
-                }).catch(error => {
-                    console.warn("Audio autoplay failed, waiting for user interaction.");
-                });
+            // Function to unmute and play the audio after video is playing
+            const playAudioAfterVideo = () => {
+                // Wait a brief moment to ensure video is playing, then unmute and play audio
+                setTimeout(() => {
+                    audio.muted = false;
+                    audio.play().then(() => {
+                        console.log("Audio started playing automatically after video playback.");
+                    }).catch(error => {
+                        console.warn("Audio autoplay failed, waiting for user interaction.");
+                    });
+                }, 500); // Adjust delay as necessary
             };
 
-            // Listen for when the video actually starts playing (progressing in time)
+            // Listen for when the video actually starts playing (time progresses)
             video.addEventListener('timeupdate', () => {
                 if (video.currentTime > 0) {
-                    // Video is playing; start the audio
-                    playAudioWhenVideoIsPlaying();
-                    // Remove the event listener to prevent repeated calls
-                    video.removeEventListener('timeupdate', playAudioWhenVideoIsPlaying);
+                    // Video is playing; attempt to start the audio after a short delay
+                    playAudioAfterVideo();
+                    // Remove event listener to avoid repeated calls
+                    video.removeEventListener('timeupdate', playAudioAfterVideo);
                 }
             });
 
@@ -64,7 +66,7 @@
                     video.muted = false; // Unmute if the user interacts
                     video.play().then(() => {
                         console.log("Video is now playing after user interaction.");
-                        playAudioWhenVideoIsPlaying(); // Start audio after video is playing
+                        playAudioAfterVideo(); // Start audio after video is playing
                     }).catch(err => {
                         console.error("Video still failed to play after interaction:", err);
                     });
