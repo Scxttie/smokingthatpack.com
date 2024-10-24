@@ -24,9 +24,11 @@
 </head>
 <body>
     <video id="bgVideo" src="packed.mp4" loop autoplay playsinline></video>
+    <audio id="bgAudio" src="packed.mp3" loop></audio>
     <script>
         window.addEventListener('load', () => {
             const video = document.getElementById('bgVideo');
+            const audio = document.getElementById('bgAudio');
 
             // Ensure the video is muted to meet autoplay policy requirements
             video.muted = true;
@@ -43,6 +45,25 @@
                         console.log("Video is now playing after user interaction.");
                     }).catch(err => {
                         console.error("Video still failed to play after interaction:", err);
+                    });
+                }, { once: true });
+            });
+
+            // Ensure the audio is muted initially to avoid autoplay policy issues
+            audio.muted = true;
+
+            // Attempt to play the audio when the page loads
+            audio.play().then(() => {
+                console.log("Audio autoplay started successfully.");
+            }).catch(error => {
+                console.warn("Audio autoplay failed. Browser restrictions require user interaction.");
+                // Add a listener for user interaction to unmute and play audio
+                document.body.addEventListener('click', () => {
+                    audio.muted = false; // Unmute the audio if the user interacts
+                    audio.play().then(() => {
+                        console.log("Audio is now playing after user interaction.");
+                    }).catch(err => {
+                        console.error("Audio still failed to play after interaction:", err);
                     });
                 }, { once: true });
             });
