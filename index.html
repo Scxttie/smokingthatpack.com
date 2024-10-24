@@ -33,23 +33,25 @@
             // Ensure the video is muted to meet autoplay policy requirements
             video.muted = true;
 
-            // Function to play the audio after video starts playing
-            const playAudioWhenVideoPlays = () => {
-                // Unmute the audio once video starts playing
+            // Function to play the audio once the video is confirmed to be playing
+            const playAudioWhenVideoIsPlaying = () => {
+                // Unmute the audio and attempt to play it
                 audio.muted = false;
                 audio.play().then(() => {
-                    console.log("Audio started playing automatically with the video.");
+                    console.log("Audio started playing after video playback.");
                 }).catch(error => {
                     console.warn("Audio autoplay failed, waiting for user interaction.");
                 });
             };
 
-            // Listen for when the video is ready to play
-            video.addEventListener('canplay', () => {
-                console.log("Video is ready to play.");
-
-                // Listen for video play event to sync audio playback
-                video.addEventListener('play', playAudioWhenVideoPlays);
+            // Listen for when the video actually starts playing (progressing in time)
+            video.addEventListener('timeupdate', () => {
+                if (video.currentTime > 0) {
+                    // Video is playing; start the audio
+                    playAudioWhenVideoIsPlaying();
+                    // Remove the event listener to prevent repeated calls
+                    video.removeEventListener('timeupdate', playAudioWhenVideoIsPlaying);
+                }
             });
 
             // Attempt to play the video
@@ -62,7 +64,7 @@
                     video.muted = false; // Unmute if the user interacts
                     video.play().then(() => {
                         console.log("Video is now playing after user interaction.");
-                        playAudioWhenVideoPlays(); // Start audio after video is playing
+                        playAudioWhenVideoIsPlaying(); // Start audio after video is playing
                     }).catch(err => {
                         console.error("Video still failed to play after interaction:", err);
                     });
