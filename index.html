@@ -23,22 +23,13 @@
     </style>
 </head>
 <body>
-    <video id="bgVideo" src="packed.mp4" loop autoplay playsinline></video>
+    <video id="bgVideo" src="packed.mp4" loop autoplay muted playsinline></video>
     <script>
-        window.addEventListener('load', function() {
+        window.addEventListener('load', () => {
             const video = document.getElementById('bgVideo');
 
-            // Ensure the video is muted before attempting to play it
+            // Ensure the video is muted to meet autoplay policy requirements
             video.muted = true;
-
-            // Reload the video source to ensure it's ready
-            video.load();
-
-            // Event listener to unmute the video once it starts playing
-            video.addEventListener('playing', () => {
-                video.muted = false;
-                console.log("Video is now unmuted.");
-            });
 
             // Attempt to play the video
             video.play().then(() => {
@@ -47,7 +38,12 @@
                 console.warn("Autoplay failed. Browser restrictions require user interaction.");
                 // In case autoplay fails, instruct the user to interact to play the video
                 document.body.addEventListener('click', () => {
-                    video.play();
+                    video.muted = false; // Unmute if the user interacts
+                    video.play().then(() => {
+                        console.log("Video is now playing after user interaction.");
+                    }).catch(err => {
+                        console.error("Video still failed to play after interaction:", err);
+                    });
                 }, { once: true });
             });
         });
